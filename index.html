@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="icons.js" defer="defer"></script>
+    <script src="variables.js" defer="defer"></script>
+    <script src="config.js" defer="defer"></script>
+    <script src="UIhandler.js" defer="defer"></script>
+    <script src="index.js" defer="defer"></script>
+    <link rel="stylesheet" href="style.css"/>
+    <title>movieDB</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar_items">
+            <div class="navbar_items_searchBar">
+                <div id="searchBTN">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="m226.83 221.17l-52.7-52.7a84.1 84.1 0 1 0-5.66 5.66l52.7 52.7a4 4 0 0 0 5.66-5.66M36 112a76 76 0 1 1 76 76a76.08 76.08 0 0 1-76-76"/></svg>
+                </div>
+                <input id="searchInput" class="navbar_items_searchBar_search" type="text" placeholder="Search everything"/>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M5 18.77v-1h1.616V9.845q0-1.96 1.24-3.447T11 4.546V3h2v1.546q1.904.366 3.144 1.853t1.24 3.447v7.923H19v1zm6.997 2.615q-.668 0-1.14-.475t-.472-1.14h3.23q0 .67-.475 1.142q-.476.472-1.143.472M7.616 17.77h8.769V9.846q0-1.823-1.281-3.104T12 5.462t-3.104 1.28t-1.28 3.104z"/></svg>
+            <img class="navbar_items_profilePic" src="https://picsum.photos/40"  alt="random"/>
+        </div>
+    </nav>
+
+    <div id="leftBar" class="leftBar">
+        <div class="leftBar_logo">
+            <span class="leftBar_logo_image">S</span>
+            <span class="leftBar_logo_title">Star Movies</span>
+        </div>
+        <div class="leftBar_options">
+            <div class="leftBar_options_one leftBar_options_one_selected" name="home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="currentColor" d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z"/></svg>
+                <span class="leftBar_options_one_title" name="home">
+                    Home
+                </span>
+            </div>
+            <div class="leftBar_options_one" name="search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256"><path fill="currentColor" d="m226.83 221.17l-52.7-52.7a84.1 84.1 0 1 0-5.66 5.66l52.7 52.7a4 4 0 0 0 5.66-5.66M36 112a76 76 0 1 1 76 76a76.08 76.08 0 0 1-76-76"/></svg>
+                <span class="leftBar_options_one_title" name="search">
+                    Search
+                </span>
+            </div>
+            <div class="leftBar_options_one" name="favorites">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="currentColor" d="m12 21l-1.45-1.3q-2.525-2.275-4.175-3.925T3.75 12.812T2.388 10.4T2 8.15Q2 5.8 3.575 4.225T7.5 2.65q1.3 0 2.475.55T12 4.75q.85-1 2.025-1.55t2.475-.55q2.35 0 3.925 1.575T22 8.15q0 1.15-.387 2.25t-1.363 2.412t-2.625 2.963T13.45 19.7z"/></svg>
+                <span class="leftBar_options_one_title" name="favorites">
+                    Favorites
+                </span>
+            </div>
+        </div>
+        <div id="leftBarHide" class="leftBar_btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6l6 6z"/></svg>
+        </div>
+    </div>
+    <div id="leftBarLittle" class="leftBar leftBarLittle">
+        <div class="leftBar_logo">
+            <span class="leftBar_logo_image">S</span>
+        </div>
+        <div class="leftBar_options leftBarLittle_options">
+            <div class="leftBar_options_one leftBarLittle_options_one leftBar_options_one_selected" name="home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" name="home"><path fill="currentColor" d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z" name="home"/></svg>
+            </div>
+            <div class="leftBar_options_one leftBarLittle_options_one" name="search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 256 256" name="search"><path fill="currentColor" d="m226.83 221.17l-52.7-52.7a84.1 84.1 0 1 0-5.66 5.66l52.7 52.7a4 4 0 0 0 5.66-5.66M36 112a76 76 0 1 1 76 76a76.08 76.08 0 0 1-76-76" name="search"/></svg>
+            </div>
+            <div class="leftBar_options_one leftBarLittle_options_one" name="favorites">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" name="favorites"><path fill="currentColor" d="m12 21l-1.45-1.3q-2.525-2.275-4.175-3.925T3.75 12.812T2.388 10.4T2 8.15Q2 5.8 3.575 4.225T7.5 2.65q1.3 0 2.475.55T12 4.75q.85-1 2.025-1.55t2.475-.55q2.35 0 3.925 1.575T22 8.15q0 1.15-.387 2.25t-1.363 2.412t-2.625 2.963T13.45 19.7z" name="favorites"/></svg>
+            </div>
+        </div>
+        <div id="leftBarShow" class="leftBar_btn leftBarLittle_btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6l-6 6z"/></svg>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header_container">
+        </div>
+        <div class="filters">
+        </div>
+        <div class="moveies">
+        </div>
+        <div class="pagination">
+            <button id="prev" class="paginationBTN">Previous</button>
+            
+            <button id="next" class="paginationBTN">Next</button>
+        </div>
+    </div>
+</body>
+</html>
