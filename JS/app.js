@@ -890,10 +890,6 @@ function getGenresIDs () {
 }
 
 function errorHandler (err) {
-    
-    console.log(err);
-    
-
     let prevState = state
     let message
     state = 'error'
