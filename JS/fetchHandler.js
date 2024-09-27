@@ -14,26 +14,36 @@ function http(...args) {
     })
 }
 
-function fetchOneMovieDetails (movie_id) {
-    isLoading = true
-    loadingHandler()
-    const movieURL = baseURL + `/3/movie/${movie_id}?language=en-US`
-    http(movieURL , options)
-        .then((movie) => {
-            createMovieDetailsPage(movie)
+counter = 0
+function fetchMoviesByYear () {
+
+    const moviesURL = baseURL + `/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_year=${yearNumbersOnFirstLoad[counter]}`
+    
+    http(moviesURL , options)
+        .then((list) => {
+            if (counter < yearNumbersOnFirstLoad.length) {
+                let key = yearNumbersOnFirstLoad[counter]
+                yearMoviesOnFirstLoad[key] = list.results
+                counter++
+                fetchMoviesByYear()
+                return
+            }
+            fetchMoviesByFilter()
         })
         .catch((err) => {
             errorHandler(err)
         })
         .finally(() => {isLoading = false})
 }
-function fetchOneMovieImages (movie_id) {
+
+function fetchOneMovieDetails (movie_id) {
     isLoading = true
-    const movieURL = baseURL + `/3/movie/${movie_id}/images`
+    loadingHandler()
+    const movieURL = baseURL + `/3/movie/${movie_id}?language=en-US`
     http(movieURL , options)
-        .then((list) => {
-            console.log('movie images : ');
-            console.log(list);
+        .then((movie) => {
+            movieDetails = movie
+            fetchSimilarMovies(movie_id)
         })
         .catch((err) => {
             errorHandler(err)
@@ -46,8 +56,9 @@ function fetchSimilarMovies (movie_id , page = 1) {
     const movieURL = baseURL + `/3/movie/${movie_id}/similar?language=en-US&page=${page}`
     http(movieURL , options)
         .then((list) => {
-            console.log('similar movies : ');
-            console.log(list.results);
+            similarMovies = list.results
+            setSessionStorageOneMovie()
+            createMovieDetailsPage(movieDetails)
         })
         .catch((err) => {
             errorHandler(err)
@@ -61,8 +72,8 @@ function searchMovie (query , year) {
     const movieURL = baseURL + `/3/search/movie?query=${query}&include_adult=true&language=en-US&page=${pageNumber}&year=${year}`
     http(movieURL , options)
         .then((list) => {
-            createSearchMessageSection(stringMessages.searchMessageResult , list.total_results , query)
-            createPageUI(list.results)
+            createSearchMessageSection(stringMessages.searchMessageResult , list.total_results)
+            createSearchSection(list.results)
         })
         .catch((err) => {
             errorHandler(err)
@@ -70,7 +81,7 @@ function searchMovie (query , year) {
         .finally(() => {isLoading = false})
 }
 
-let counter = 0
+
 function fetchMoviesByFilter () {
     let genres = filterOption.genres[1]
     let year = counter === 0 ? yearNumbersOnFirstLoad[counter] : filterOption.year[1]
@@ -88,16 +99,8 @@ function fetchMoviesByFilter () {
     
     http(moviesURL , options)
         .then((list) => {
-            if (counter < yearNumbersOnFirstLoad.length) {
-                let key = yearNumbersOnFirstLoad[counter]
-                yearMoviesOnFirstLoad[key] = list.results
-                counter++
-                filterOption.year[1] = yearNumbersOnFirstLoad[counter]
-                fetchMoviesByFilter()
-                return
-            }
             setSessionStorage(list.results)
-            createPageUI(list.results)
+            createHomeSection(list.results)
         })
         .catch((err) => {
             errorHandler(err)
@@ -111,7 +114,8 @@ function fetchGenres () {
     http(genreURL , options)
         .then((list) => {
             genres = list.genres
-            fetchMoviesByFilter()
+            fetchMoviesByYear()
+            fetchPeople()
         })
         .catch((err) => {
             errorHandler(err)
@@ -120,8 +124,7 @@ function fetchGenres () {
 }
 
 function fetchPeople () {
-    isLoading = true
-    const genreURL = baseURL + `/3/person/popular?language=en-US&page=${pageNumber}`
+    const genreURL = baseURL + `/3/person/popular?language=en-US&page=1`
     http(genreURL , options)
         .then((list) => {
             peoples = list.results
@@ -130,7 +133,6 @@ function fetchPeople () {
         .catch((err) => {
             errorHandler(err)
         })
-        .finally(() => {isLoading = false})
 }
 
 function fetchFromLocalStorage () {

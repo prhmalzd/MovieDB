@@ -1,5 +1,3 @@
-searchInput.addEventListener('input' , updateSearchText)
-searchBTN.addEventListener('click' , searchMovieHandler)
 
 leftBarOptions.forEach((option) => {
     option.addEventListener('click' , leftBarOptionsFunc)
@@ -8,32 +6,16 @@ leftBarOptions.forEach((option) => {
 changeLeftBarShowBTN.addEventListener('click' , showLeftBarHandler)
 changeLeftBarHideBTN.addEventListener('click' , hideLeftBarHandler)
 
-nextPageBTN.addEventListener('click' , () => {
-    pageNumber++
-    if (state === 'home') {
-        checkSessionStorage()
-    }
-    else if (state === 'favorites') {
-        createFavoriteSection()
-    }
-    else if (state === 'search') {
-        searchMovie(searchText)
-    }
-})
-
-prevPageBTN.addEventListener('click' , () => {
-    if (pageNumber === 1) return
-    pageNumber--
-    if (state === 'home') {
-        checkSessionStorage()
-    }
-    else if (state === 'favorites') {
-        createFavoriteSection()
-    }
-    else if (state === 'search') {
-        searchMovie(searchText)
-    }
-})
+function showLeftBarHandler () {
+    leftBarBig.style.opacity = '100%'
+    leftBarLittle.style.opacity = '0%'
+    container.style.marginLeft = '200px'
+}
+function hideLeftBarHandler () {
+    leftBarBig.style.opacity = '0%'
+    leftBarLittle.style.opacity = '100%'
+    container.style.marginLeft = '70px'
+}
 
 function leftBarOptionsFunc (event) {
     
@@ -52,7 +34,7 @@ function leftBarOptionsFunc (event) {
         selectedOption.classList.add('leftBar_options_one_selected')
     })
 
-    if (name === 'home') {
+    if (name === 'home' && state !== 'home') {
         showSlideBarMovies = true
         state = 'home'
         pageNumber = 1
@@ -62,13 +44,11 @@ function leftBarOptionsFunc (event) {
         filterOption.arrange = ['Popular' , 'popularity.desc']
         checkSessionStorage()
     }
-    else if (name === 'favorites') {
+    else if (name === 'favorites' && state !== 'favorites') {
         state = 'favorites'
-        clearHeader()
-        clearFilters()
         createFavoriteSection()
     }
-    else if (name === 'search') {
+    else if (name === 'search' && state !== 'search') {
         state = 'search'
         clearHeader()
         clearFilters()
@@ -80,9 +60,19 @@ function leftBarOptionsFunc (event) {
 
 function createPeoplesSection () {
 
+    const peoplesContainerDiv = createPeoplesElements(true)
+
+    const peoplesContainerDivLittleBar = createPeoplesElements(false)
+    peoplesContainerDivLittleBar.classList.add('leftBarLittle_peoples')
+
+    leftBarBig.append(peoplesContainerDiv)
+    leftBarLittle.append(peoplesContainerDivLittleBar)
+}
+
+function createPeoplesElements (isForLeftBarBig) {
     const peopleContainerDiv = document.createElement('div')
     peopleContainerDiv.classList.add('leftBar_peoples')
-    
+
     for (let people of peoples) {
         const baseUrlImage = 'https://image.tmdb.org/t/p/w500'
         const imgaeURL = `${baseUrlImage}${people.profile_path}`
@@ -106,167 +96,43 @@ function createPeoplesSection () {
         img.src = imgaeURL
 
         divContainer.append(imgDiv)
-        divContainer.append(spanTitle)
+        if (isForLeftBarBig) {
+            divContainer.append(spanTitle)
+        }
+        
         peopleContainerDiv.append(divContainer)
     }
-
-    const moreButton = document.createElement('button')
-    moreButton.textContent = 'بیشتر'
-    moreButton.addEventListener('click' , () => {})
-
-    peopleContainerDiv.append(moreButton)
-
-    leftBarBig.append(peopleContainerDiv)
-
-    
-    
-}
-
-function updateSearchText (event) {
-    const value = event.target.value
-    searchText = value
-    debounce()
-}
-
-function debounce () {
-    clearTimeout(debounceTimer)
-    
-    debounceTimer = setTimeout(() => {
-        searchMovieHandler()
-    } , 800)
-}
-
-function searchMovieHandler () {
-
-    if (searchText.length === 0) return
-    
-    clearHeader()
-    clearFilters()
-    state = 'search'
-    searchMovie(searchText)
-    searchText = ''
-    searchInput.value = ''
-    pageNumber = 1
-    paginationButtonUpdate()
-
-    const selectedOptions = document.querySelectorAll(`div[name=${state}]`)
-    
-    Array.from(leftBarOptions).forEach((leftBarOption) => {
-        Array.from(leftBarOption.children).forEach((option) => {
-            option.classList.remove('leftBar_options_one_selected')
-        })  
-    })
-    Array.from(selectedOptions).forEach((selectedOption) => {
-        selectedOption.classList.add('leftBar_options_one_selected')
-    })
-}
-
-function filterSelectFunc (event) {
-    const name = event.target.name
-    const options = event.target
-    
-    if (name === 'arrange') {
-        felterArrangeSelectFunc(options)
-    }
-    else if (name === 'genres') {
-        felterGenreSelectFunc(options)
-    }
-    else if (name === 'year') {
-        felterYearSelectFunc(options)
-    }
-    else if (name === 'vote') {
-        felterVoteSelectFunc(options)
-    }
-
-    checkSessionStorage()
-}
-
-function felterArrangeSelectFunc (options) {
-    
-
-    Array.from(options).forEach((option , index) => {
-        if (option.selected) {
-            if (index === 0) {
-                filterOption.arrange = ['Popular' ,'popularity.desc']
-            }
-            else if (index === 1) {
-                filterOption.arrange = ['Top Rated' ,'vote_average.desc']
-            }
-            else if (index === 2) {
-                filterOption.arrange = ['Upcoming' ,'primary_release_date.desc']
-            }
-            return
-        }
-    })
-}
-function felterGenreSelectFunc (options) {
-
-    Array.from(options).forEach((option , index) => {
-        if (option.selected) {
-            let id = Number(option.id)
-            
-            
-            if (index === 0) {
-                filterOption.genres = ['All' , '']
-                filterOption.genresNames = []
-                filterOption.genresIDs = []
-            }
-            else {
-
-                for (genre of genres) {
-                if (genre.id === id) {
-                        filterOption.genres = [genre.name ,id]
-                        filterOption.genresNames.push(genre.name)
-                        filterOption.genresIDs.push(genre.id)
-                    }
-                }
-            }
-            return
-        }
-    })
-}
-function felterYearSelectFunc (options) {
-
-    Array.from(options).forEach((option , index) => {
-        if (option.selected) {
-            
-            if (index === 0) {
-                filterOption.year = ['All' , '']
-            }
-            else {
-                filterOption.year = [ option.value , option.value]
-            }
-            return
-        }
-    })
-}
-function felterVoteSelectFunc (options) {
-    Array.from(options).forEach((option , index) => {
-        option.removeAttribute('selected')
-        if (option.selected) {
-            option.setAttribute('selected' , true)
-            if (index === 0) {
-                filterOption.vote = ['All' , '']
-            }
-            else {
-                filterOption.vote = [ option.value , option.value]
-            }
-            return
-        }
-    })
+    return peopleContainerDiv
 }
 
 function checkSessionStorage () {
+    clearSearch()
+
     let storagedDetails = getSessionStorage()
     
     if (storagedDetails) {
         let parsedMovies = JSON.parse(storagedDetails)
-        clearMoviesContainer()
-        createPageUI(parsedMovies)
+        createHomeSection(parsedMovies)
         return
     }
 
     fetchMoviesByFilter()
+}
+
+function checkSessionStorageOneMovie () {
+
+    let storagedDetails = getSessionStorageOneMovie()
+    
+    if (storagedDetails) {
+        let parsedMovie = JSON.parse(storagedDetails)
+        movieDetails = parsedMovie.details
+        similarMovies = parsedMovie.similar
+        
+        createMovieDetailsPage(movieDetails)
+        return
+    }
+
+    fetchOneMovieDetails(movieId)
 }
 
 function getSessionStorage () {
@@ -276,6 +142,12 @@ function getSessionStorage () {
 
     return result
 }
+
+function getSessionStorageOneMovie () {
+    const result = sessionStorage.getItem(movieId)
+    return result
+}
+
 function setSessionStorage (movies) {
     const stringfyFilterOption = JSON.stringify(filterOption)
     const key = stringfyFilterOption + '&page:' + pageNumber
@@ -283,26 +155,16 @@ function setSessionStorage (movies) {
     sessionStorage.setItem(key , stringifyMovies)
 }
 
-function createSearchMessageSection (message , count , query) {
-    clearFilters()
-    const seachMessageDiv = document.createElement('div')
-    seachMessageDiv.classList.add('search_message')
-    seachMessageDiv.textContent = message + ' ' + count + ' : ' + (query ? query : '')
-    filtersContainer.append(seachMessageDiv)
+function setSessionStorageOneMovie () {
+    const value = {
+        details : movieDetails,
+        similar : similarMovies
+    }
+    const stringfyValue = JSON.stringify(value)
+    sessionStorage.setItem(movieId , stringfyValue)
 }
 
-function showLeftBarHandler () {
-    leftBarBig.style.opacity = '100%'
-    leftBarLittle.style.opacity = '0%'
-    container.style.marginLeft = '200px'
-}
-function hideLeftBarHandler () {
-    leftBarBig.style.opacity = '0%'
-    leftBarLittle.style.opacity = '100%'
-    container.style.marginLeft = '70px'
-}
-
-function createPageUI (movies) {
+function createHomeSection (movies) {
     
     clearMoviesContainer()
     
@@ -321,12 +183,10 @@ function createPageUI (movies) {
         }
         showSlideBarMovies = false
     }
-    
-    if (state !== 'search'){
-        createFilterSection()
-        clearInterval(headerChangeInterval)
-        createCarousel(movies)
-    }
+
+    createFilterSection()
+    clearInterval(headerChangeInterval)
+    createCarousel(movies)
     
     
     for (let movie of movies) {
@@ -336,7 +196,25 @@ function createPageUI (movies) {
     paginationButtonUpdate()
 }
 
+function createSearchSection (movies) {
+    clearMoviesContainer()
+    
+    if (movies.length === 0) {
+        createFilterSection()
+        nothingToShow()
+        return
+    }
+     
+    for (let movie of movies) {
+        const movieDiv = createOneMovie(movie)
+        moviesContainer.append(movieDiv)
+    }
+    paginationButtonUpdate()
+}
+
 function createFavoriteSection () {
+    clearHeader()
+    clearFilters()
     clearMoviesContainer()
     let movieCounter = pageNumber * 20
 
@@ -471,7 +349,9 @@ function createHeaderMovie (movieInfo) {
         headerDiv.classList.add('header_image_error')
         imageLoadErroHandler(headerDiv)
     }
-    img.src = imgaeURL
+    if (movieInfo.backdrop_path) {
+        img.src = imgaeURL
+    }
     
     ratingDiv.innerHTML = imdbIcon
     ratingDiv.append(ratingSpan)
@@ -490,14 +370,16 @@ function createFilterSection () {
 
     const selectedGenreSection = createSelectedGenreElement()
 
-    filtersContainer.append(selectedGenreSection)
-
+    
     for (option in filtersOptions) {
         selectOptions = []
         let value = filtersOptions[option]
         const div = document.createElement('div')
         div.classList.add(`filters_${value}`)
-
+        if (value === 'genres') {
+            div.append(selectedGenreSection)
+        }
+        
         const select = document.createElement('select')
         select.setAttribute('name' , value)
         select.classList.add(`filters_${value}_select`)
@@ -530,18 +412,18 @@ function createFilterSection () {
         }
 
         if (value === 'genres') {
-            const option = document.createElement('option')
-            option.textContent = 'All'
-            select.append(option)
+            const defaultOption = document.createElement('option')
+            defaultOption.textContent = '---'
+            defaultOption.id = 'default_option_genres'
+            defaultOption.setAttribute('selected' , true)
+            select.append(defaultOption)
+            const allOption = document.createElement('option')
+            allOption.textContent = 'All'
+            select.append(allOption)
             for (let genre of genres) {
                 const option = document.createElement('option')
                 option.textContent = genre.name
                 option.id = genre.id
-                if (option.id == filterOption.genres[1])
-                {
-                    option.setAttribute('selected' , true)
-                    
-                }
                 select.append(option)
             }
             label.textContent = 'ژانر'
@@ -557,8 +439,7 @@ function createFilterSection () {
                     value == filterOption.arrange[0]
                 )
                 {
-                    option.setAttribute('selected' , true)
-                    
+                    option.setAttribute('selected' , true)  
                 }
                 
                 select.append(option)
@@ -581,29 +462,35 @@ function createSelectedGenreElement () {
         const value = filterOption.genresNames[index]
         const id = filterOption.genresIDs[index]
 
-        const genreSpan = document.createElement('span')
-        genreSpan.textContent = value
-        
-        const deleteDiv = document.createElement('div')
-        deleteDiv.innerHTML = deleteIcon
-        deleteDiv.addEventListener('click' , () => {
-            removeSelectedGenre(index , id)
-        })
-        
-        const genreDiv = document.createElement('div')
-        genreDiv.classList.add('filters_selectedGenres_oneGenre')
-
-        genreDiv.append(genreSpan)
-        genreDiv.append(deleteDiv)
+        const genreDiv = createOneGenreElement(value , id)
         selectedGenreSection.append(genreDiv)
     }
     return selectedGenreSection
 }
 
-function removeSelectedGenre (index , id) {
+function createOneGenreElement(value , id) {
+    const genreDiv = document.createElement('div')
+    genreDiv.classList.add('filters_selectedGenres_oneGenre')
 
-    let newNames = filterOption.genresNames.filter((name , i) => {
-        if (Number(index) !== i) {
+    const genreSpan = document.createElement('span')
+    genreSpan.textContent = value
+        
+    const deleteDiv = document.createElement('div')
+    deleteDiv.innerHTML = deleteIcon
+    deleteDiv.addEventListener('click' , () => {
+        removeSelectedGenre(value , id , genreDiv)
+    })
+
+    genreDiv.append(genreSpan)
+    genreDiv.append(deleteDiv)
+
+    return genreDiv
+}
+
+function removeSelectedGenre (value , id , genreDiv) {
+
+    let newNames = filterOption.genresNames.filter((name) => {
+        if (value !== name) {
             return true
         }
     })
@@ -615,58 +502,16 @@ function removeSelectedGenre (index , id) {
     
     filterOption.genresNames = newNames
     filterOption.genresIDs = newIds
+    if (filterOption.genresNames.length < 1) {
+        filterOption.genres = ['All' , '']
+    }
+    
+    genreDiv.remove()
+    
     checkSessionStorage()
 }
 
-function createCarouselMoviesByYear (movies , year) {
 
-        const buttonSeeMore = document.createElement('button')
-        buttonSeeMore.textContent = 'بیشتر'
-        buttonSeeMore.addEventListener('click' , () => {
-            state = 'home'
-            pageNumber = 1
-            filterOption.vote = ['All' , '']
-            filterOption.year = [year , year]
-            filterOption.genres = ['All' , '']
-            
-            Array.from(leftBarOptions).forEach((leftBarOption) => {
-                Array.from(leftBarOption.children).forEach((option) => {
-                    option.classList.remove('leftBar_options_one_selected')
-                })  
-            })
-
-            checkSessionStorage()
-        })
-    
-        const carouselYearTitle = document.createElement('span')
-        carouselYearTitle.textContent = year
-        
-    
-        const carouselMoviesTitleDiv = document.createElement('div')
-        carouselMoviesTitleDiv.classList.add('moveies_carousel_year_titleContainer')
-
-        const moviesContainerCarousel = document.createElement('div')
-        moviesContainerCarousel.classList.add('moveies_carousel_year_moviesContainer')
-    
-        const carouselDiv = document.createElement('div')
-        carouselDiv.classList.add('moveies_carousel_year')
-        
-        carouselMoviesTitleDiv.append(buttonSeeMore)
-        carouselMoviesTitleDiv.append(carouselYearTitle)
-        carouselDiv.append(carouselMoviesTitleDiv)
-        
-        let index = 1
-        
-        for (let movie of movies) {
-            if (index > 10) break
-            const movieDiv = createOneMovie(movie)
-            moviesContainerCarousel.append(movieDiv)
-            index++
-        }
-        
-        carouselDiv.append(moviesContainerCarousel)
-        moviesContainer.append(carouselDiv)
-}
 
 function createOneMovieLoading () {
     clearMoviesContainer()
@@ -683,11 +528,68 @@ function createOneMovieLoading () {
     moviesContainer.append(loadingDivContainer)
 }
 
+function createCarouselMoviesByYear (movies , year) {
+
+    let buttonSeeMore = document.createElement('button')
+    let carouselTitle = document.createElement('span')
+
+    if (year) {
+        buttonSeeMore.textContent = 'بیشتر'
+        buttonSeeMore.addEventListener('click' , () => {
+            state = 'home'
+            pageNumber = 1
+            filterOption.vote = ['All' , '']
+            filterOption.year = [year , year]
+            filterOption.genres = ['All' , '']
+            
+            Array.from(leftBarOptions).forEach((leftBarOption) => {
+                Array.from(leftBarOption.children).forEach((option) => {
+                    option.classList.remove('leftBar_options_one_selected')
+                })  
+            })
+    
+            checkSessionStorage()
+            window.scrollTo({top: 0 , behavior : 'smooth'})
+        })
+    
+        carouselTitle.textContent = year
+    }
+    else {
+        buttonSeeMore = document.createElement('div')
+        carouselTitle.textContent = 'فیلم های مشابه'
+    }
+
+    const carouselMoviesTitleDiv = document.createElement('div')
+    carouselMoviesTitleDiv.classList.add('moveies_carousel_year_titleContainer')
+
+    const moviesContainerCarousel = document.createElement('div')
+    moviesContainerCarousel.classList.add('moveies_carousel_year_moviesContainer')
+
+    const carouselDiv = document.createElement('div')
+    carouselDiv.classList.add('moveies_carousel_year')
+    
+    carouselMoviesTitleDiv.append(buttonSeeMore)
+    carouselMoviesTitleDiv.append(carouselTitle)
+    carouselDiv.append(carouselMoviesTitleDiv)
+    
+    let index = 1
+    
+    for (let movie of movies) {
+        if (index > 10) break
+        const movieDiv = createOneMovie(movie)
+        moviesContainerCarousel.append(movieDiv)
+        index++
+    }
+    
+    carouselDiv.append(moviesContainerCarousel)
+    moviesContainer.append(carouselDiv)
+}
 
 function createOneMovie (movieInfo) {
     
     let imgaeURL
     const baseUrlImage = 'https://image.tmdb.org/t/p/w500'
+
     if (movieInfo.backdrop_path) {
         imgaeURL = `${baseUrlImage}${movieInfo.poster_path}`
     }  
@@ -698,12 +600,15 @@ function createOneMovie (movieInfo) {
     containerDiv.addEventListener('click' , (event) => {
         const tagName = event.target.tagName
         if (tagName === 'svg' || tagName === 'path') {
-            faveMovie(faveBTN , movieInfo)
+            faveMovieHandler(faveBTN , movieInfo)
             return
         }
-        
+        clearSearch()
         state = 'oneMovie'
-        fetchOneMovieDetails(movieInfo.id)
+        movieId = movieInfo.id
+        clearPageForMovieDetails()
+        checkSessionStorageOneMovie()
+        window.scrollTo({top: 0 , behavior : 'smooth'})
     })
 
     const imageDiv = document.createElement('div')
@@ -717,7 +622,11 @@ function createOneMovie (movieInfo) {
         imageDiv.classList.add('moveies_one_image_error')
         imageLoadErroHandler(imageDiv)
     }
-    img.src = imgaeURL
+
+    if (movieInfo.backdrop_path) {
+        img.src = imgaeURL
+    }  
+    
 
     const infoDiv = document.createElement('div')
     infoDiv.classList.add('moveies_one_information')
@@ -799,7 +708,7 @@ function getShortText (text) {
     return shortHandText
 }
 
-function faveMovie (btn , info) {
+function faveMovieHandler (btn , info) {
 
     if (btn.classList.contains('faved')) {
         btn.classList.remove('faved')
@@ -838,7 +747,7 @@ function movieUnFaved (info) {
     localStorage.setItem('favedMovies' , strigfyedFavedMovies)
 }
 
-function createMovieDetailsPageLoading () {
+function clearPageForMovieDetails () {
     clearFilters()
     clearMoviesContainer()
     paginationButtonUpdate()
@@ -877,7 +786,9 @@ function createMovieDetailsPage (movie) {
         headerImage.classList.add('moveies_one_image_error')
         imageLoadErroHandler(headerImage)
     }
-    backDropImage.src = backDropImageURL
+    if (movie.backdrop_path) {
+        backDropImage.src = backDropImageURL
+    }
 
     const movieDetailsContainer = document.createElement('div')
     movieDetailsContainer.classList.add('movie_container')
@@ -893,7 +804,9 @@ function createMovieDetailsPage (movie) {
         imageDiv.classList.add('moveies_one_image_error')
         imageLoadErroHandler(imageDiv)
     }
-    profileImage.src = backDropImageURL
+    if (movie.poster_path) {
+        profileImage.src = backDropImageURL
+    }
 
     const detailsContainer = document.createElement('div')
     detailsContainer.classList.add('movie_container_details')
@@ -940,34 +853,8 @@ function createMovieDetailsPage (movie) {
     headerContainer.append(headerImage)
     moviesContainer.append(movieDetailsContainer)
 
+    createCarouselMoviesByYear(similarMovies)
 
-}
-
-function paginationButtonUpdate () {
-
-    prevPageBTN.style.display = 'block'
-    nextPageBTN.style.display = 'block'
-    
-    const moviesContainerLength = moviesContainer.children.length
-
-
-    if (state === 'nothing' || state === 'error' || state === 'oneMovie') {
-        nextPageBTN.style.display = 'none'
-        prevPageBTN.style.display = 'none'
-        return
-    }
-
-    if ( moviesContainerLength < 20) {
-        nextPageBTN.style.display = 'none'
-        prevPageBTN.style.display = 'none'
-    }
-
-    if (pageNumber === 1) {
-        prevPageBTN.style.display = 'none'
-    }
-    if (pageNumber > 1) {
-        prevPageBTN.style.display = 'block'
-    }
 }
 
 function loadingHandler () {
@@ -976,7 +863,6 @@ function loadingHandler () {
     }
     else if (state === 'oneMovie') {
         createHeaderLoading()
-        createMovieDetailsPageLoading()
     }
     else {
         createHeaderLoading()
@@ -1004,7 +890,7 @@ function getGenresIDs () {
 }
 
 function errorHandler (err) {
-
+    
     console.log(err);
     
 
@@ -1052,13 +938,14 @@ function createErrorElement(prevState , msg) {
 }
 
 function refreshPageHandler(prevState) {
-    // home
-    // search
     state = prevState
     if (state === 'home') {
         checkSessionStorage()
     }
     else if (state === 'search') {
         searchMovieHandler()
+    }
+    else if (state === 'oneMovie') {
+        fetchOneMovieDetails(movieId)
     }
 }

@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="JS/config.js" defer="defer"></script>
     <script src="JS/icons.js" defer="defer"></script>
     <script src="JS/variables.js" defer="defer"></script>
-    <script src="JS/config.js" defer="defer"></script>
-    <script src="JS/UIhandler.js" defer="defer"></script>
-    <script src="JS/index.js" defer="defer"></script>
+    <script src="JS/fetchHandler.js" defer="defer"></script>
+    <script src="JS/app.js" defer="defer"></script>
+    <script src="JS/filter.js" defer="defer"></script>
+    <script src="JS/pagination.js" defer="defer"></script>
+    <script src="JS/search.js" defer="defer"></script>
     <link rel="stylesheet" href="CSS/style.css"/>
     <title>movieDB</title>
 </head>
@@ -20,7 +23,6 @@
                 </div>
                 <input id="searchInput" class="navbar_items_searchBar_search" type="text" placeholder="Search everything"/>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M5 18.77v-1h1.616V9.845q0-1.96 1.24-3.447T11 4.546V3h2v1.546q1.904.366 3.144 1.853t1.24 3.447v7.923H19v1zm6.997 2.615q-.668 0-1.14-.475t-.472-1.14h3.23q0 .67-.475 1.142q-.476.472-1.143.472M7.616 17.77h8.769V9.846q0-1.823-1.281-3.104T12 5.462t-3.104 1.28t-1.28 3.104z"/></svg>
             <img class="navbar_items_profilePic" src="https://picsum.photos/40"  alt="random"/>
         </div>
     </nav>

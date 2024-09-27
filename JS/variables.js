@@ -64,3 +64,7 @@ const stringMessages = {
 
 let yearNumbersOnFirstLoad = [1994 , 2003 , 2013 , '']
 let yearMoviesOnFirstLoad = {}
+
+let movieId
+let movieDetails
+let similarMovies
